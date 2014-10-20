@@ -2,23 +2,26 @@
 //= require jquery_ujs
 //= require_tree .
 
+var score = 0;
+var questionNum = 0;
+
 $(document).ready(function () {
 
-    loadQuestion();
+    loadQuestion(questionNum);
 
 });
 
-function loadQuestion() {
+function loadQuestion(question) {
     $.getJSON("1/questions", function (data) {
         var items = [];
 
-        items.push("<h2>" + data[0].description + "</h2>");
+        items.push("<h2>" + data[question].description + "</h2>");
 
-        $.each(data[0]["possible_answers"], function (key, val) {
+        $.each(data[question]["possible_answers"], function (key, val) {
             items.push("<button class='btn btn-default' data-correct=" + val.correct + ">" + val.description + "</button>");
         });
         items.push("<button id='next' class='btn btn-primary' data-correct=" + false + ">" + "Next" + "</button>");
-        items.push("<h4 id='score' >" + 0 + "/ 4" + "</button>");
+        items.push("<h4 id='score' >" + score + "/ 4" + "</button>");
 
 
         $("<ul/>", {
@@ -33,33 +36,37 @@ function loadQuestion() {
 
 function registerClick() {
 
-    console.log("green");
 
     $("button").on('click', function(){
-        console.log($(this).data('correct'));
+
         if ($(this).data("correct") == true){
-            $(this).attr("class", "btn btn-success");
-//            $(this).toggleClass("btn btn-success");
+            score = score + 1;
         } else {
-            console.log($("button"));
-            fillButtons();
-            $(this).attr("class", "btn btn-danger")
+            score = score + 0;
         }
 
+        $("button").off('click');
+        fillButtons();
     })
 }
 
 function fillButtons() {
-    console.log("ello gov");
+
     $.each ($("button"), function(key,val){
+
         if ($(this).data("correct") == true){
             $(this).attr("class", "btn btn-success");
         } else {
             $(this).attr("class", "btn btn-danger")
         }
-        $("#next").attr("class", "btn btn-primary");
-        console.log(val)
+
+        $(this).disable = true
     });
+
+    $("#next").disable = false;
+    $("#next").attr("class", "btn btn-primary");
+    questionNum = questionNum + 1;
+    loadQuestion(questionNum)
 }
 
 
